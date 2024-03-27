@@ -11,7 +11,7 @@ namespace StudentsPortal_API.Controllers
     public class StudentsController : ControllerBase
     {
         [HttpGet]
-        public IEnumerable<StudentsDto> GetStudents()
+        public ActionResult<IEnumerable<StudentsDto>> GetStudents()
         {
             List<StudentsDto> listd = new List<StudentsDto>()
             {
@@ -21,11 +21,14 @@ namespace StudentsPortal_API.Controllers
 
             };
 
-            return listd;
+            return Ok(listd);
         }
 
         [HttpGet("ID")]
-        public StudentsDto GetStudentByID(int ID)
+        //[ProducesResponseType(200)]
+        //[ProducesResponseType(404)]
+        //[ProducesResponseType(400)]
+        public ActionResult<StudentsDto> GetStudentByID(int ID)
         {
             List<StudentsDto> listd = new List<StudentsDto>()
             {
@@ -34,7 +37,31 @@ namespace StudentsPortal_API.Controllers
                 new StudentsDto(){ID=103,FirstName="F Name",LastName="L Name",Age=28,Username="demo",Password="123",Address="Address",City="City",Email="demo@gmail.com",FatherName="Father Name",IsDisabled=false }
 
             };
-            return listd.Where(x => x.ID == ID).FirstOrDefault(); 
+            if(ID<1)
+            {
+                return BadRequest();
+            }
+
+            var stdobj= listd.Where(x => x.ID == ID).FirstOrDefault();
+            if(stdobj==null)
+            {
+                return NotFound();
+            }
+            return Ok(stdobj);
+        }
+
+        [HttpPost]
+        public ActionResult CreateNew(StudentsDto model)
+        {
+            if(model==null)
+            {
+                return BadRequest();
+            }
+            if(model.ID<1)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            return Ok();
         }
     }
 }
