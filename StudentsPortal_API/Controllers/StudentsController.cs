@@ -10,16 +10,18 @@ namespace StudentsPortal_API.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
+        private ILogger<StudentsController> _logger;
+        public StudentsController(ILogger<StudentsController> logger)
+        {
+
+            _logger = logger;
+
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<StudentsDto>> GetStudents()
         {
-            List<StudentsDto> listd = new List<StudentsDto>()
-            {
-                new StudentsDto(){ID=101,FirstName="F Name",LastName="L Name",Age=28,Username="demo",Password="123",Address="Address",City="City",Email="demo@gmail.com",FatherName="Father Name",IsDisabled=false },
-                new StudentsDto(){ID=102,FirstName="F Name",LastName="L Name",Age=28,Username="demo",Password="123",Address="Address",City="City",Email="demo@gmail.com",FatherName="Father Name",IsDisabled=false },
-                new StudentsDto(){ID=103,FirstName="F Name",LastName="L Name",Age=28,Username="demo",Password="123",Address="Address",City="City",Email="demo@gmail.com",FatherName="Father Name",IsDisabled=false }
-
-            };
+            List<StudentsDto> listd = new List<StudentsDto>();
 
             return Ok(listd);
         }

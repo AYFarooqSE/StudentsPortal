@@ -1,7 +1,10 @@
-﻿namespace StudentsPortal_API.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StudentsPortal_API.Model
 {
     public class StudentsModel
     {
+        [Key]
         public int ID { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
