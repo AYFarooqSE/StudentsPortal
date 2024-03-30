@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudentsPortal_API.Data;
 using StudentsPortal_API.Model;
 using StudentsPortal_API.Model.Dto;
@@ -60,7 +61,10 @@ namespace StudentsPortal_API.Controllers
         {
 
             var ModelToUpdate = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == ID).FirstOrDefault();
-            if(ModelToUpdate==null)
+            // Sometime it tracks previous IDs while Using FirstOrDefault
+            //var ModelToUpdate = _context.Tbl_StudentsBasicInfo.AsNoTracking().Where(x => x.ID == ID).FirstOrDefault();
+            
+            if (ModelToUpdate==null)
             {
                 return NotFound();
             }
