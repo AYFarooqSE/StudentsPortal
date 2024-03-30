@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StudentsPortal_API.Data;
 using StudentsPortal_API.Model;
 using StudentsPortal_API.Model.Dto;
 
@@ -10,60 +12,75 @@ namespace StudentsPortal_API.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        private ILogger<StudentsController> _logger;
-        public StudentsController(ILogger<StudentsController> logger)
+        private ApplicationContext _context;
+        public StudentsController(ApplicationContext context)
         {
 
-            _logger = logger;
+            _context = context;
 
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<StudentsDto>> GetStudents()
         {
-            List<StudentsDto> listd = new List<StudentsDto>();
-
-            return Ok(listd);
+            return Ok(_context.Tbl_StudentsBasicInfo.ToList());
         }
 
         [HttpGet("ID")]
-        //[ProducesResponseType(200)]
-        //[ProducesResponseType(404)]
-        //[ProducesResponseType(400)]
-        public ActionResult<StudentsDto> GetStudentByID(int ID)
+        public ActionResult<StudentsModel> GetStudents(int? StudentID)
         {
-            List<StudentsDto> listd = new List<StudentsDto>()
-            {
-                new StudentsDto(){ID=101,FirstName="F Name",LastName="L Name",Age=28,Username="demo",Password="123",Address="Address",City="City",Email="demo@gmail.com",FatherName="Father Name",IsDisabled=false },
-                new StudentsDto(){ID=102,FirstName="F Name",LastName="L Name",Age=28,Username="demo",Password="123",Address="Address",City="City",Email="demo@gmail.com",FatherName="Father Name",IsDisabled=false },
-                new StudentsDto(){ID=103,FirstName="F Name",LastName="L Name",Age=28,Username="demo",Password="123",Address="Address",City="City",Email="demo@gmail.com",FatherName="Father Name",IsDisabled=false }
-
-            };
-            if(ID<1)
-            {
-                return BadRequest();
-            }
-
-            var stdobj= listd.Where(x => x.ID == ID).FirstOrDefault();
-            if(stdobj==null)
-            {
-                return NotFound();
-            }
-            return Ok(stdobj);
+            var model = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == StudentID).FirstOrDefault();
+            return Ok(model);
         }
 
         [HttpPost]
-        public ActionResult CreateNew(StudentsDto model)
+        public ActionResult CreateNew(StudentsModel model)
         {
-            if(model==null)
+            if (model != null)
             {
-                return BadRequest();
+                _context.Tbl_StudentsBasicInfo.Add(model);
+                _context.SaveChanges();
             }
-            if(model.ID<1)
+            return Ok(model);
+        }
+        [HttpDelete]
+        public ActionResult Delete(int id)
+        {
+            var modelToDelete = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == id).FirstOrDefault();
+            if (modelToDelete != null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                _context.Tbl_StudentsBasicInfo.Remove(modelToDelete);
+                _context.SaveChanges();
             }
-            return Ok();
+            return Ok(modelToDelete);
+        }
+        [HttpPut]
+        [Route("{ID:int}")]
+        public IActionResult UpdateData([FromBody] StudentsDto model, [FromRoute] int? ID)
+        {
+
+            var ModelToUpdate = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == ID).FirstOrDefault();
+            if(ModelToUpdate==null)
+            {
+                return NotFound();
+            }
+
+            ModelToUpdate.FirstName= model.FirstName;
+            ModelToUpdate.LastName= model.LastName;
+            ModelToUpdate.Email= model.Email;
+            ModelToUpdate.Address= model.Address;
+            ModelToUpdate.City= model.City;
+            ModelToUpdate.Age= model.Age;
+            ModelToUpdate.FatherName= model.FatherName;
+            ModelToUpdate.Username= model.Username;
+            ModelToUpdate.Password= model.Password;
+            ModelToUpdate.IsDisabled= model.IsDisabled;
+
+
+            _context.Tbl_StudentsBasicInfo.Update(ModelToUpdate);
+            _context.SaveChanges();
+            
+            return NoContent();
         }
     }
 }
