@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Hosting.Builder;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StudentsPortal_API.Data;
 using StudentsPortal_API.Model;
 using StudentsPortal_API.Model.Dto;
+using System.Reflection.Metadata.Ecma335;
 
 namespace StudentsPortal_API.Controllers
 {
@@ -14,24 +16,31 @@ namespace StudentsPortal_API.Controllers
     public class StudentsController : ControllerBase
     {
         private ApplicationContext _context;
-        public StudentsController(ApplicationContext context)
+        private IMapper _mapper;
+        public StudentsController(ApplicationContext context, IMapper mapper)
         {
 
             _context = context;
+            _mapper = mapper;
 
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<StudentsDto>> GetStudents()
         {
-            return Ok(_context.Tbl_StudentsBasicInfo.ToList());
+            var StudentLists = _context.Tbl_StudentsBasicInfo.ToList();
+            
+            // _mapper.Map<Destination>(Source)
+
+            return Ok(_mapper.Map<List<StudentsDto>>(StudentLists));
         }
 
         [HttpGet("ID")]
-        public ActionResult<StudentsModel> GetStudents(int? StudentID)
+        public ActionResult<StudentsDto> GetStudents(int? StudentID)
         {
             var model = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == StudentID).FirstOrDefault();
-            return Ok(model);
+
+            return Ok(_mapper.Map<StudentsDto>(model));
         }
 
         [HttpPost]
@@ -41,26 +50,13 @@ namespace StudentsPortal_API.Controllers
             {
                 return NotFound();
             }
-
-            StudentsModel Stdmodel = new StudentsModel()
-            {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Username = model.Username,
-                Password = model.Password,
-                Address = model.Address,
-                City = model.City,
-                FatherName = model.FatherName,
-                Age = model.Age,
-                Email = model.Email,
-                CreatedAt = DateTime.Now,
-                IsDisabled = false
-            };
+            var Stdmodel = _mapper.Map<StudentsModel>(model);
 
             _context.Tbl_StudentsBasicInfo.Add(Stdmodel);
             _context.SaveChanges();
 
-            return CreatedAtRoute("GetStudents", new { ID = Stdmodel.ID }, Stdmodel);
+            //return CreatedAtRoute("GetStudents", new { ID = model.ID }, model);
+            return Ok(Stdmodel);
         }
         [HttpDelete]
         public ActionResult Delete(int id)
@@ -78,25 +74,17 @@ namespace StudentsPortal_API.Controllers
         public IActionResult UpdateData([FromBody] StudentUpdateDto model, [FromRoute] int? ID)
         {
 
-            var ModelToUpdate = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == ID).FirstOrDefault();
+            var StdDb = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == ID).FirstOrDefault();
             // Sometime it tracks previous IDs while Using FirstOrDefault
             //var ModelToUpdate = _context.Tbl_StudentsBasicInfo.AsNoTracking().Where(x => x.ID == ID).FirstOrDefault();
 
-            if (ModelToUpdate == null)
+            if (StdDb == null)
             {
                 return NotFound();
             }
 
-            ModelToUpdate.FirstName = model.FirstName;
-            ModelToUpdate.LastName = model.LastName;
-            ModelToUpdate.Email = model.Email;
-            ModelToUpdate.Address = model.Address;
-            ModelToUpdate.City = model.City;
-            ModelToUpdate.Age = model.Age;
-            ModelToUpdate.FatherName = model.FatherName;
-            ModelToUpdate.Username = model.Username;
-            ModelToUpdate.Password = model.Password;
-            ModelToUpdate.IsDisabled = model.IsDisabled;
+            var ModelToUpdate = _mapper.Map<StudentsModel>(model);
+
 
 
             _context.Tbl_StudentsBasicInfo.Update(ModelToUpdate);
