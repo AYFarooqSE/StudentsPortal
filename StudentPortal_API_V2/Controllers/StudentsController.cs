@@ -22,20 +22,20 @@ namespace StudentsPortal_API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<StudentsDto>> GetStudents()
+        public async  Task<ActionResult<IEnumerable<StudentsDto>>> GetStudents()
         {
-            return Ok(_context.Tbl_StudentsBasicInfo.ToList());
+            return Ok( await _context.Tbl_StudentsBasicInfo.ToListAsync());
         }
 
         [HttpGet("ID")]
-        public ActionResult<StudentsModel> GetStudents(int? StudentID)
+        public async Task<ActionResult<StudentsModel>> GetStudents(int? StudentID)
         {
-            var model = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == StudentID).FirstOrDefault();
+            var model = await _context.Tbl_StudentsBasicInfo.Where(x => x.ID == StudentID).FirstOrDefaultAsync();
             return Ok(model);
         }
 
         [HttpPost]
-        public ActionResult CreateNew(StudentCreateDto model)
+        public async Task<ActionResult> CreateNew(StudentCreateDto model)
         {
             if (model == null)
             {
@@ -58,27 +58,27 @@ namespace StudentsPortal_API.Controllers
             };
 
             _context.Tbl_StudentsBasicInfo.Add(Stdmodel);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return CreatedAtRoute("GetStudents", new { ID = Stdmodel.ID }, Stdmodel);
         }
         [HttpDelete]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             var modelToDelete = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == id).FirstOrDefault();
             if (modelToDelete != null)
             {
-                _context.Tbl_StudentsBasicInfo.Remove(modelToDelete);
-                _context.SaveChanges();
+                _context.Tbl_StudentsBasicInfo.Remove(modelToDelete); // Remove Don't have async
+                 await _context.SaveChangesAsync();
             }
             return Ok(modelToDelete);
         }
         [HttpPut]
         [Route("{ID:int}")]
-        public IActionResult UpdateData([FromBody] StudentUpdateDto model, [FromRoute] int? ID)
+        public async Task<IActionResult> UpdateData([FromBody] StudentUpdateDto model, [FromRoute] int? ID)
         {
 
-            var ModelToUpdate = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == ID).FirstOrDefault();
+            var ModelToUpdate = await _context.Tbl_StudentsBasicInfo.Where(x => x.ID == ID).FirstOrDefaultAsync();
             // Sometime it tracks previous IDs while Using FirstOrDefault
             //var ModelToUpdate = _context.Tbl_StudentsBasicInfo.AsNoTracking().Where(x => x.ID == ID).FirstOrDefault();
 
@@ -100,7 +100,7 @@ namespace StudentsPortal_API.Controllers
 
 
             _context.Tbl_StudentsBasicInfo.Update(ModelToUpdate);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
