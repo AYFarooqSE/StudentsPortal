@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StudentPortal_API_V2.Repository.IRepository;
 using StudentsPortal_API.Data;
 using StudentsPortal_API.Model;
 using StudentsPortal_API.Model.Dto;
@@ -14,25 +15,25 @@ namespace StudentsPortal_API.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        private ApplicationContext _context;
+        private IStudentRepository _students;
         private IMapper _mapper;
-        public StudentsController(ApplicationContext context,IMapper mapper)
+        public StudentsController(IStudentRepository students, IMapper mapper)
         {
             _mapper= mapper;
-            _context = context;
+            _students = students;
         }
 
         [HttpGet]
         public async  Task<ActionResult<IEnumerable<StudentsDto>>> GetStudents()
         {
-            var modelDb = await _context.Tbl_StudentsBasicInfo.ToListAsync();
+            var modelDb = await _students.GetAll();
             return Ok(_mapper.Map<List<StudentsDto>>(modelDb));
         }
 
         [HttpGet("ID")]
         public async Task<ActionResult<StudentsDto>> GetStudents(int? StudentID)
         {
-            var model = await _context.Tbl_StudentsBasicInfo.Where(x => x.ID == StudentID).FirstOrDefaultAsync();
+            var model = await _students.Get(x=>x.ID==StudentID);
             return Ok(_mapper.Map<StudentsDto>(model));
         }
 
@@ -44,9 +45,7 @@ namespace StudentsPortal_API.Controllers
                 return NotFound();
             }
             var Stdmodel = _mapper.Map<StudentsModel>(model);
-
-            _context.Tbl_StudentsBasicInfo.Add(Stdmodel);
-            await _context.SaveChangesAsync();
+            await _students.Create(Stdmodel);
 
             //return CreatedAtRoute("GetStudents", new { ID = Stdmodel.ID }, Stdmodel);
             return Ok(Stdmodel);
@@ -54,13 +53,11 @@ namespace StudentsPortal_API.Controllers
         [HttpDelete]
         public async Task<ActionResult> Delete(int id)
         {
-            var modelToDelete = _context.Tbl_StudentsBasicInfo.Where(x => x.ID == id).FirstOrDefault();
-            if (modelToDelete != null)
-            {
-                _context.Tbl_StudentsBasicInfo.Remove(modelToDelete); // Remove Don't have async
-                 await _context.SaveChangesAsync();
-            }
-            return Ok(modelToDelete);
+            var model = await _students.Get(x => x.ID == id);
+            
+            await _students.Delete(model);
+            
+            return NoContent();
         }
         [HttpPut]
         [Route("{ID:int}")]
@@ -72,8 +69,7 @@ namespace StudentsPortal_API.Controllers
             }
             var ModelToUpdate = _mapper.Map<StudentsModel>(modelDto);
 
-            _context.Tbl_StudentsBasicInfo.Update(ModelToUpdate);
-            await _context.SaveChangesAsync();
+            await _students.UpdateRecord(ModelToUpdate);
 
             return NoContent();
         }
