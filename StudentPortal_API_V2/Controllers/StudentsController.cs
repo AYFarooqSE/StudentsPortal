@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using StudentPortal_API_V2;
 using StudentPortal_API_V2.Repository.IRepository;
 using StudentsPortal_API.Data;
 using StudentsPortal_API.Model;
 using StudentsPortal_API.Model.Dto;
+using System.Net;
 
 namespace StudentsPortal_API.Controllers
 {
@@ -17,28 +19,37 @@ namespace StudentsPortal_API.Controllers
     {
         private IStudentRepository _students;
         private IMapper _mapper;
+        public ApiResponse _response;
         public StudentsController(IStudentRepository students, IMapper mapper)
         {
             _mapper= mapper;
             _students = students;
+            _response = new();
         }
 
         [HttpGet]
-        public async  Task<ActionResult<IEnumerable<StudentsDto>>> GetStudents()
+        public async  Task<ActionResult<ApiResponse>> GetStudents()
         {
+
             var modelDb = await _students.GetAll();
-            return Ok(_mapper.Map<List<StudentsDto>>(modelDb));
+            _response.Result = _mapper.Map<List<StudentsDto>>(modelDb);
+            _response.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_response);
         }
 
         [HttpGet("ID")]
-        public async Task<ActionResult<StudentsDto>> GetStudents(int? StudentID)
+        public async Task<ActionResult<ApiResponse>> GetStudents(int? StudentID)
         {
             var model = await _students.Get(x=>x.ID==StudentID);
-            return Ok(_mapper.Map<StudentsDto>(model));
+            _response.Result = _mapper.Map<StudentsDto>(model);
+            _response.StatusCode=HttpStatusCode.OK;
+
+            return Ok(_response);
         }
 
         [HttpPost]
-        public async Task<ActionResult> CreateNew(StudentCreateDto model)
+        public async Task<ActionResult<ApiResponse>> CreateNew(StudentCreateDto model)
         {
             if (model == null)
             {
@@ -56,12 +67,13 @@ namespace StudentsPortal_API.Controllers
             var model = await _students.Get(x => x.ID == id);
             
             await _students.Delete(model);
-            
-            return NoContent();
+            _response.Result = model;
+            _response.StatusCode=HttpStatusCode.NoContent;
+            return Ok(_response);
         }
         [HttpPut]
         [Route("{ID:int}")]
-        public async Task<IActionResult> UpdateData([FromBody] StudentUpdateDto modelDto, [FromRoute] int? ID)
+        public async Task<ActionResult<ApiResponse>> UpdateData([FromBody] StudentUpdateDto modelDto, [FromRoute] int? ID)
         {
             if(modelDto==null||ID!=modelDto.ID)
             {
@@ -70,8 +82,10 @@ namespace StudentsPortal_API.Controllers
             var ModelToUpdate = _mapper.Map<StudentsModel>(modelDto);
 
             await _students.UpdateRecord(ModelToUpdate);
+            _response.Result=ModelToUpdate;
+            _response.StatusCode=HttpStatusCode.NoContent;
 
-            return NoContent();
+            return Ok(_response);
         }
     }
 }

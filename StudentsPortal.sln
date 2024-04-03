@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudentsPortal_API", "Stude
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentPortal_API_V2", "StudentPortal_API_V2\StudentPortal_API_V2.csproj", "{6BAD7651-E26F-495F-A790-8B84C343F51A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentPortal_Web", "StudentPortal_Web\StudentPortal_Web.csproj", "{A30355BF-C3C0-4A40-AC85-FEE30D926E48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentPortal_SD", "StudentPortal_SD\StudentPortal_SD.csproj", "{A60D695B-4B6E-4E42-8EBD-0DBD653A87C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{6BAD7651-E26F-495F-A790-8B84C343F51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BAD7651-E26F-495F-A790-8B84C343F51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BAD7651-E26F-495F-A790-8B84C343F51A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A30355BF-C3C0-4A40-AC85-FEE30D926E48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A30355BF-C3C0-4A40-AC85-FEE30D926E48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A30355BF-C3C0-4A40-AC85-FEE30D926E48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A30355BF-C3C0-4A40-AC85-FEE30D926E48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A60D695B-4B6E-4E42-8EBD-0DBD653A87C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A60D695B-4B6E-4E42-8EBD-0DBD653A87C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A60D695B-4B6E-4E42-8EBD-0DBD653A87C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A60D695B-4B6E-4E42-8EBD-0DBD653A87C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

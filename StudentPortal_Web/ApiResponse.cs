@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace StudentPortal_API_V2
+namespace StudentPortal_Web
 {
     public class ApiResponse
     {
