@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StudentPortal_API_V2;
+using StudentPortal_Web.Services;
+using StudentPortal_Web.Services.IService;
 using StudentsPortal_Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,7 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddAutoMapper(typeof(MappingsConfig));
-builder.Services.AddHttpClient();
+
+builder.Services.AddHttpClient<IStudentService,StudentService>();
+builder.Services.AddScoped<IStudentService,StudentService>();
 
 var app = builder.Build();
 
