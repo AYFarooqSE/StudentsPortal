@@ -1,35 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using StudentPortal_Web.Models;
+using StudentPortal_Web.Models.Dto;
+using StudentPortal_Web.Services.IService;
 namespace StudentPortal_Web.Controllers
 {
     public class StudentPortalController : Controller
     {
-        private IHttpClientFactory _clientFactory;
-        public string BaseUrl = "https://localhost:7001/api/Students";
-        public StudentPortalController(IHttpClientFactory clientFactory)
+        private IStudentService _serviceRepo;
+        private IMapper _mapper;
+        public StudentPortalController(IStudentService serviceRepo,IMapper mapper)
         {
-            _clientFactory = clientFactory;
+            _serviceRepo = serviceRepo;
+            _mapper= mapper;
         }
         public async Task<IActionResult> Index()
         {
-            string Error=string.Empty;
-
-            var url = BaseUrl;
-            StudentsModel studentsInfo;
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            var client = _clientFactory.CreateClient();
-            client.DefaultRequestHeaders.Add("Accept", "application/json");
-            HttpResponseMessage respone = await client.SendAsync(request);
-            if (respone.IsSuccessStatusCode)
+            List<StudentsDto> Stdlist=new List<StudentsDto>();
+            var Response = await _serviceRepo.GetAllAsync<ApiResponse>();
+            if(Response!=null && Response.IsSuccess)
             {
-                studentsInfo = await respone.Content.ReadFromJsonAsync<StudentsModel>();
-                return Json(studentsInfo);
+                Stdlist = JsonConvert.DeserializeObject<List<StudentsDto>>(Convert.ToString(Response.Result));
             }
-            else
-            {
-                Error = $"Error: {respone.ReasonPhrase}";
-                return Json(Error);
-            }
+            return View();
         }
     }
 }
